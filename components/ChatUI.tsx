@@ -9,7 +9,9 @@ interface Message {
   time: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  "https://fitness-chatbot-backend.onrender.com";
 
 function getOrCreateUserId(): string {
   const key = "fitcoach_user_id";
@@ -28,7 +30,10 @@ function createId(): string {
 }
 
 function formatTime(): string {
-  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 const QUICK_PROMPTS = [
@@ -94,7 +99,12 @@ export default function ChatUI() {
     async (text: string) => {
       if (!text.trim() || loading) return;
 
-      const userMsg: Message = { id: createId(), role: "user", text, time: formatTime() };
+      const userMsg: Message = {
+        id: createId(),
+        role: "user",
+        text,
+        time: formatTime(),
+      };
       setMessages((prev) => [...prev, userMsg]);
       setInput("");
       setLoading(true);
@@ -108,20 +118,35 @@ export default function ChatUI() {
 
         if (!res.ok) {
           const errData = await res.json().catch(() => null);
-          throw new Error((errData as { error?: string })?.error || `Server error (${res.status})`);
+          throw new Error(
+            (errData as { error?: string })?.error ||
+              `Server error (${res.status})`,
+          );
         }
 
         const data = (await res.json()) as { reply?: string; error?: string };
-        const replyText = data.reply ?? data.error ?? "Something went wrong. Please try again.";
+        const replyText =
+          data.reply ?? data.error ?? "Something went wrong. Please try again.";
         setMessages((prev) => [
           ...prev,
-          { id: createId(), role: "assistant", text: replyText, time: formatTime() },
+          {
+            id: createId(),
+            role: "assistant",
+            text: replyText,
+            time: formatTime(),
+          },
         ]);
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : "Could not reach the server.";
+        const errorMsg =
+          err instanceof Error ? err.message : "Could not reach the server.";
         setMessages((prev) => [
           ...prev,
-          { id: createId(), role: "assistant", text: errorMsg, time: formatTime() },
+          {
+            id: createId(),
+            role: "assistant",
+            text: errorMsg,
+            time: formatTime(),
+          },
         ]);
       } finally {
         setLoading(false);
